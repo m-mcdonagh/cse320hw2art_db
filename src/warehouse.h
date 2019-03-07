@@ -27,13 +27,12 @@ structure of meta_info
 struct warehouse_list {
     uint64_t meta_info; // Meta information about warehouse node; it is mimicking memory block header
     struct warehouse* warehouse; // Useful information about actual warehouse; think of payload
-    struct warehouse_list* next_warehouse; // This pointer should point to the `struct warehouse' of the next node
+    struct warehouse_list* next_warehouse;
 };
 
 struct warehouse_sf_list {
     // `class_size' represents warehouse sizes that correspond to the list this node points to
     int class_size;
-    // Pointer below should point to the `struct warehouse' of the head node in the `warehouse_list'
     struct warehouse_list* warehouse_list_head;
     struct warehouse_sf_list* sf_next_warehouse;
 };
