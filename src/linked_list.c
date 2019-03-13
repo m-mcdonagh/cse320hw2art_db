@@ -72,6 +72,20 @@ struct warehouse* createWarehouse(int id, int size){
 	return output;
 }
 
+/*
+ * createWarehouseList()
+ * malloc's space for a member of a warehouse list and initializes its values
+ *
+ * Params: 
+ * 	warehouse
+ * 	the payload of the warehouse list member
+ *
+ * 	private
+ * 	BOOLEAN used to initialized the single bit of meta_info to indicate if the warehouse is private or public
+ *
+ * Return:	
+ * 	pointer to newly malloc'd warehouse struct
+ */
 struct warehouse_list* createWarehouseList(struct warehouse* warehouse, BOOLEAN private){
 	struct warehouse_list* output = malloc(sizeof(struct warehouse_list));
 	output->warehouse = warehouse;
@@ -139,7 +153,18 @@ void insertWarehouseSFList(struct warehouse_sf_list* toBeInserted){
 	}
 }
 
-void insertWarehouseList(struct warehouse_list* warehouse_list){
+/*
+ * insertWarehouseList
+ * inserts a warehouse list into a new SF List member, since insertWarehouse() appends warehouse lists to already made SF List members
+ * 
+ * Params: 
+ * 	warehouse_list
+ * 	list to be the head of a new SF List member
+ *
+ * Return:
+ * 	void
+ */
+void insertNewWarehouseList(struct warehouse_list* warehouse_list){
 	if (!warehouse_list)
 		return;
 	int class_size = (warehouse_list->meta_info >> 1) & -2;
@@ -147,9 +172,23 @@ void insertWarehouseList(struct warehouse_list* warehouse_list){
 	insertWarehouseSFList( createWarehouseSFList( class_size, warehouse_list ));
 }
 
+/*
+ * insertWarehouse()
+ * Creates a new warehouse list member (as a wrapper) either appends it to the SF List of its class size, or creates a new SF List of its class size
+ *
+ * Params:
+ * 	warehouse
+ * 	warehouse to be wrapped and inserted
+ *
+ * 	private
+ * 	BOOLEAN to indicate whether the warehouse is private or public
+ *
+ * Return:
+ * 	void
+ */
 void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
 	if (empty){
-		insertWarehouseList( createWarehouseList( warehouse, private ));
+		insertNewWarehouseList( createWarehouseList( warehouse, private ));
 	}
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	while (sf_cursor){
@@ -163,7 +202,7 @@ void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
 		}
 		sf_cursor = sf_cursor->sf_next_warehouse;
 	}
-	insertWarehouseList( createWarehouseList( warehouse, private ));
+	insertNewWarehouseList( createWarehouseList( warehouse, private ));
 }
 
 /***********************************************************************************************/
