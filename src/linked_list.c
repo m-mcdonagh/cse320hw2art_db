@@ -10,6 +10,77 @@ extern struct warehouse_sf_list* sf_head;	// Head of the Segregated Free List fo
 BOOLEAN empty = TRUE;				// Value to keep track of the the elements in the Segregated Free List for initializing sf_head
 
 /*
+ * badInt()
+ * Checks to see if the ID is valid
+ *
+ * Params:	id
+ * 		the ID to be checked
+ *
+ * Return:	TRUE if ID is negative or if a warehouse in the data structure already has that ID
+ * 		FALSE otherwise
+ */
+BOOLEAN badID(int id){
+	if (id<0){
+		printf("ERROR: All ID's must be positive. %d is not!\n", id);
+		return TRUE;
+	}
+	if (empty)
+		return FALSE;
+	else{
+		struct warehouse_sf_list* sf_cursor = sf_head;
+		struct warehouse_list* wl_cursor;
+		while (sf_cursor){
+			wl_cursor = sf_cursor->warehouse_list_head;
+			while (wl_cursor){
+				if (id == wl_cursor->warehouse->id){
+					printf("ERROR: All ID's must be unique. %d is not!", id);
+					return TRUE;
+				}
+				wl_cursor = wl_cursor->next_warehouse;
+			}
+			sf_cursor = sf_cursor->sf_next_warehouse;
+		}
+		return FALSE;
+	}
+}
+
+/*
+ * createWarehouse()
+ * allocates space for a Warehouse struct, initialized with a unique ID, a specified size, and a NULL art collection
+ *
+ * Params:
+ * 	id
+ * 	integer used to identify the warehouse
+ * 	
+ * 	size
+ * 	the storage capacity of the warehouse
+ *
+ * Return:
+ * 	pointer to a newly malloc'd warehouse struct
+ */
+struct warehouse* createWarehouse(int id, int size){
+	if (badID(id))
+		return NULL;
+	if ((size & 1) || (size<4)){
+		printf("ERROR: warehouse size must be a multiple of 2 and greated than 4, %d has size of %d\n", id, size);
+		return NULL;
+	}
+	struct warehouse* output = malloc(sizeof(struct warehouse));
+	output->id = id;
+	output->size = size;
+	output->art_collection = NULL;
+	return output;
+}
+
+struct warehouse_list* createWarehouseList(struct warehouse* warehouse, BOOLEAN private){
+	struct warehouse_list* output = malloc(sizeof(struct warehouse_list));
+	output->warehouse = warehouse;
+	output->meta_info = ((warehouse->size)<<1) | (private & 1);
+	output->next_warehouse = NULL;
+	return output;
+}
+
+/*
  * createWarehouseSFList()
  * allocates memory for a new class size of warehouses for the segregated free list
  * 
@@ -42,6 +113,8 @@ struct warehouse_sf_list* createWarehouseSFList(int class_size, struct warehouse
  * 	void	
  */
 void insertWarehouseSFList(struct warehouse_sf_list* toBeInserted){
+	if (!toBeInserted)
+		return;
 	if (empty)
 		sf_head = toBeInserted;
 	else{
@@ -66,90 +139,34 @@ void insertWarehouseSFList(struct warehouse_sf_list* toBeInserted){
 	}
 }
 
-struct warehouseIDList{
-	int id;
-	struct warehouseIDList* next;
-} warehouseIDHead;
+void insertWarehouseList(struct warehouse_list* warehouse_list){
+	if (!warehouse_list)
+		return;
+	int class_size = (warehouse_list->meta_info >> 1) & -2;
+	
+	insertWarehouseSFList( createWarehouseSFList( class_size, warehouse_list ));
+}
 
-
-BOOLEAN badID(int id){
-	if (id<0){
-		printf("ERROR: All ID's must be positive. %d is not!\n", id);
-		return TRUE;
-	}
-	struct wareHouseIDList newID = malloc(sizeof(struct warehouseIDList));
-	newID->id = id;
+void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
 	if (empty){
-		warehouseIDHead = newID;
-		warehouseIDHead->next = NULL;
-		return FALSE;
-	}	
-	else{
-		if (warehouseIDHead->id > id){
-			newID->next = warehouseIDHead;
-			warehouseIDHead = newID;
-			return FALSE;
-		struct warehouseIDList cursor = warehouseIDHead;
-		struct warehouseIDList prev = warehouseIDHead;
-		while (cursor){
-			if (cursor->id == id){
-				free(newID);
-				return TRUE;
-			}
-			if (cursor->id > id){
-				prev->next = newID;
-				newID->next = cursor;
-				return FALSE;
-			}
-			prev = cursor;
-			cursor = cursor->next;
-		}
-		prev->next = newID;
-		newID->next = NULL;
-		return FALSE;
-		}
+		insertWarehouseList( createWarehouseList( warehouse, private ));
 	}
+	struct warehouse_sf_list* sf_cursor = sf_head;
+	while (sf_cursor){
+		if (sf_cursor->class_size == warehouse->size){
+			struct warehouse_list* wl_cursor = sf_cursor->warehouse_list_head;
+			while (wl_cursor->next_warehouse){
+				wl_cursor = wl_cursor->next_warehouse;
+			}
+			wl_cursor->next_warehouse = createWarehouseList(warehouse, private);
+			return;
+		}
+		sf_cursor = sf_cursor->sf_next_warehouse;
+	}
+	insertWarehouseList( createWarehouseList( warehouse, private ));
 }
 
-/*
- * createWarehouse()
- * allocates space for a Warehouse struct, initialized with a unique ID, a specified size, and a NULL art collection
- *
- * Params:
- * 	id
- * 	integer used to identify the warehouse
- * 	
- * 	size
- * 	the storage capacity of the warehouse
- *
- * Return:
- * 	pointer to a newly malloc'd warehouse struct
- */
-struct warehouse* createWarehouse(int id, int size){
-	if (badID(id))
-		return NULL;
-	struct warehouse* output = malloc(sizeof(struct warehouse));
-	output->id = id;
-	output->size = size;
-	output->art_collection = NULL;
-	return output;
-}
-
-struct warehouse_list* createWarehouseList(int id, int size, BOOLEAN private){
-	if ((size & 1) || (size<4)){
-		printf("ERROR: warehouse size must be a multiple of 2 and greated than 4, %d has size of %d\n", id, size);
-		return NULL;
-	}
-	struct warehouse_list* output = malloc(sizeof(struct warehouse_list));
-	output->warehouse = createWarehouse(id, size);
-	if (!(output->warehouse)){
-		free(output);
-		return NULL;
-	}
-	output->meta_info = size<<1;
-
-
-
+/***********************************************************************************************/
 
 /*
  * freeWarehouse()
