@@ -1,5 +1,6 @@
 #ifndef WAREHOUSE_H
 #define WAREHOUSE_H
+#define BOOLEAN char
 
 #include <stdint.h>
 
@@ -38,4 +39,9 @@ struct warehouse_sf_list {
 };
 
 struct warehouse_sf_list* sf_head;
+struct warehouse* createWarehouse(int id, int size);
+void insertWarehouse(struct warehouse* warehouse, BOOLEAN private);
+void removeWarehouse(int id);
+void removeWarehouseList(struct warehouse_list* warehouseListMember);
+int nextGoodID();
 #endif /* WAREHOUSE_H */

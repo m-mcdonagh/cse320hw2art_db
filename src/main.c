@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include "warehouse.h"
+#define BOOLEAN char
+#define FALSE 0
+#define TRUE 1
 
-
-extern struct warehouse_sf_list* createWarehouseSFList(int class_size);
-extern void insertWarehouseSFList(struct warehouse_sf_list* toBeInserted);
+extern struct warehouse* createWarehouse(int id, int size);
+extern void insertWarehouse(struct warehouse* warehouse, BOOLEAN private);
 extern void freeAllWarehouseSFList();
 
-
 int main(int argc, char** argv) {
+
+
+
+	freeAllWarehouseSFList();
 	return 0;
 }

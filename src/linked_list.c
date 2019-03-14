@@ -19,9 +19,10 @@ BOOLEAN empty = TRUE;				// Value to keep track of the the elements in the Segre
  * Return:	TRUE if ID is negative or if a warehouse in the data structure already has that ID
  * 		FALSE otherwise
  */
-BOOLEAN badID(int id){
-	if (id<0){
-		printf("ERROR: All ID's must be positive. %d is not!\n", id);
+BOOLEAN badID(int id, BOOLEAN userInput){
+	if (id<=0){
+		if(userInput)
+			printf("ERROR: All ID's must be positive. %d is not!\n", id);
 		return TRUE;
 	}
 	if (empty)
@@ -33,7 +34,8 @@ BOOLEAN badID(int id){
 			wl_cursor = sf_cursor->warehouse_list_head;
 			while (wl_cursor){
 				if (id == wl_cursor->warehouse->id){
-					printf("ERROR: All ID's must be unique. %d is not!", id);
+					if (userInput)
+						printf("ERROR: All ID's must be unique. %d is not!", id);
 					return TRUE;
 				}
 				wl_cursor = wl_cursor->next_warehouse;
@@ -43,6 +45,12 @@ BOOLEAN badID(int id){
 		return FALSE;
 	}
 }
+
+int nextGoodID(){
+	int output = 0;
+	while (badID(++output, FALSE));
+	return output;
+}	
 
 /*
  * createWarehouse()
@@ -59,8 +67,9 @@ BOOLEAN badID(int id){
  * 	pointer to a newly malloc'd warehouse struct
  */
 struct warehouse* createWarehouse(int id, int size){
-	if (badID(id))
+	if (badID(id, TRUE)){
 		return NULL;
+	}
 	if ((size & 1) || (size<4)){
 		printf("ERROR: warehouse size must be a multiple of 2 and greated than 4, %d has size of %d\n", id, size);
 		return NULL;
@@ -129,8 +138,10 @@ struct warehouse_sf_list* createWarehouseSFList(int class_size, struct warehouse
 void insertWarehouseSFList(struct warehouse_sf_list* toBeInserted){
 	if (!toBeInserted)
 		return;
-	if (empty)
+	if (empty){
 		sf_head = toBeInserted;
+		empty=FALSE;
+	}
 	else{
 		if (sf_head->class_size > toBeInserted->class_size){
 			toBeInserted->sf_next_warehouse = sf_head;
@@ -189,6 +200,7 @@ void insertNewWarehouseList(struct warehouse_list* warehouse_list){
 void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
 	if (empty){
 		insertNewWarehouseList( createWarehouseList( warehouse, private ));
+		return;
 	}
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	while (sf_cursor){
