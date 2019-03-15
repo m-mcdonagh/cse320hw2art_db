@@ -46,10 +46,15 @@ char** commandSplitter(char* commandLine){
 
 void shell_loop(){
 	char* commandLine;
+	char** arguments;
 	size_t bufsize = 256;
+	BOOLEAN notExit = TRUE;
 	
-	do{
+	while(notExit){
 		printf("> ");
 		getline(&commandLine, &bufsize, stdin);
-	} while (1);
+		arguments = commandSplitter(commandLine);
+		notExit = executeCommand(arguments);
+		free(arguments);
+	}
 }
