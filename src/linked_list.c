@@ -59,7 +59,7 @@ BOOLEAN badID(int id, BOOLEAN userInput){
  * 	integer ID that can be used by a subsequent warehouse
  */
 int nextGoodID(){
-	int output = 0;
+	int output = 5000;
 	while (badID(++output, FALSE));
 	return output;
 }	
