@@ -42,6 +42,7 @@ struct warehouse_sf_list* sf_head;
 struct warehouse* createWarehouse(int id, int size);
 void insertWarehouse(struct warehouse* warehouse, BOOLEAN private);
 void removeWarehouse(int id);
-void removeWarehouseList(struct warehouse_list* warehouseListMember);
+void freeWarehouse(struct warehouse* warehouse);
+void freeAllWarehouseSFList();
 int nextGoodID();
 #endif /* WAREHOUSE_H */

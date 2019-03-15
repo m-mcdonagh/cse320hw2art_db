@@ -16,6 +16,9 @@ BOOLEAN empty = TRUE;				// Value to keep track of the the elements in the Segre
  * Params:	id
  * 		the ID to be checked
  *
+ * 		userInput
+ * 		if true, it gives the user feedback, if not, the feedback is suppressed (for use in nextGoodID())
+ *
  * Return:	TRUE if ID is negative or if a warehouse in the data structure already has that ID
  * 		FALSE otherwise
  */
@@ -46,6 +49,15 @@ BOOLEAN badID(int id, BOOLEAN userInput){
 	}
 }
 
+/*
+ * nextGoodID()
+ * finds the next valid ID to be used in cases of splitting a warehouse into 2
+ *
+ * Params: void
+ *
+ * Return:
+ * 	integer ID that can be used by a subsequent warehouse
+ */
 int nextGoodID(){
 	int output = 0;
 	while (badID(++output, FALSE));
@@ -283,3 +295,7 @@ void freeAllWarehouseSFList(){
 		free(temp);
 	}
 }
+
+
+/***********************************************************************************************/
+
