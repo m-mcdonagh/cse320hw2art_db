@@ -6,6 +6,8 @@
 #define FALSE 0
 #define TRUE 1
 
+extern void shell_loop();
+
 int main(int argc, char** argv) {
 	BOOLEAN quiet = FALSE;
 	FILE* warehousesFile;
@@ -58,6 +60,9 @@ int main(int argc, char** argv) {
 		printf("ERROR: no Query Provided\n");
 		exit(1);
 	};
+
+	shell_loop();
+
 	printf("DONE.\n");
 	freeAllWarehouseSFList();
 	return 0;
