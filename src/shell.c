@@ -26,9 +26,7 @@ char** commandSplitter(char* commandLine){
 		printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 		return NULL;
 	}
-	char** output = malloc(MAXARGS+1 * sizeof(char*));
-	for (int i=0; i<MAXARGS+1; i++)
-		output[i] = NULL;
+	char** output = calloc(MAXARGS+1 ,sizeof(char *));
 	int index = 0;
 	output[index] = commandLine;
 	

@@ -11,8 +11,8 @@ BOOLEAN equals(char* s1, char*s2){
 	return !strcmp(s1, s2);
 }
 
-BOOLEAN executeCommand(char** arguments){
-	if (equals(*arguments, "help")){
+BOOLEAN executeCommand(char** args){
+	if (equals(*args, "help")){
 		printf("help\t\t\t\tLists available commands.\n");
 		printf("load warehouse \"filename\"\tLoads into the database warehouses from a file.\n");
 		printf("load art \"filename\"\t\tLoads into the database art collections from a file.\n");
@@ -23,19 +23,48 @@ BOOLEAN executeCommand(char** arguments){
 		printf("delete art \"name\"\t\tRemoves any art collections with the specified name from the database.\n");
 		printf("utilization\t\t\tPrints to stdout the ratio of occupied warehouses to the total and the ratio of the total size of art collections to\n\t\t\t\t\tthe total capacity of the warehouses.\n");
 	}
-	else if (equals(*arguments, "load")){
+	else if (equals(*args, "load")){
+		if (equals(*++args, "warehouse")){
+			if (*++args) {
+				FILE* warehouseFile = fopen(*args, "r");
+				if (warehouseFile){
+					//loadWarehouseFile(warehouseFile);
+					fclose(warehouseFile);
+				}
+				else{
+					printf("ERROR: failed to open %s\n", *args);
+				}
+			}
+			else printf("ERROR: no file specified\n");
+		}
+		else if (equals(*args,  "art")){
+			if (*++args) {
+				FILE* artFile = fopen(*args, "r");
+				if (artFile){
+					//loadArtFile(artFile);
+					fclose(artFile);
+				}
+				else{
+					printf("ERROR: failed to open %s\n", *args);
+				}
+			}
+			else printf("ERROR: no file specified\n");
+		}
+		else{
+			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
+		}
 	}
-	else if (equals(*arguments, "printall")){
+	else if (equals(*args, "printall")){
 	}
-	else if (equals(*arguments, "print")){
+	else if (equals(*args, "print")){
 	}
-	else if (equals(*arguments, "add")){
+	else if (equals(*args, "add")){
 	}
-	else if (equals(*arguments, "delete")){
+	else if (equals(*args, "delete")){
 	}
-	else if (equals(*arguments, "utilization")){
+	else if (equals(*args, "utilization")){
 	}
-	else if (equals(*arguments, "exit")){
+	else if (equals(*args, "exit")){
 		return FALSE;
 	}
 	else{
