@@ -15,18 +15,19 @@
  * Params
  * 	commandLine
  * 	pointer to a string. It's contents are changed and referenced by the return value, so it shouldn't be altered outside of this function for the return values's duration of use (done so each *output need not be free()'d)
+ *	
+ *	maxArgs
+ *	value to determine the maximum amount of args checked for and returned
  *
  * Return
- * 	Pointer to pointers of strings, up to 5
+ * 	Pointer to pointers of strings, up to maxArgs
  */
-#define MAXARGS 5 //value to determine how many arguments are passed into the function
-char** commandSplitter(char* commandLine){
+char** commandSplitter(char* commandLine, int maxArgs, BOOLEAN userInput){
 	while (isspace(*commandLine)) commandLine++;
 	if (*commandLine == '\0'){
-		printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 		return NULL;
 	}
-	char** output = calloc(MAXARGS+1 ,sizeof(char *));
+	char** output = calloc(maxArgs+1 ,sizeof(char *));
 	int index = 0;
 	output[index] = commandLine;
 	
@@ -37,7 +38,7 @@ char** commandSplitter(char* commandLine){
 				return output;
 			}
 			*commandLine = '\0';
-			if (index >= MAXARGS-1)
+			if (index >= maxArgs-1)
 				return output;
 			while (isspace(*++commandLine));
 			if (*commandLine == '\0')
@@ -46,7 +47,6 @@ char** commandSplitter(char* commandLine){
 				output[++index] = ++commandLine;
 				while (*commandLine != '\"'){
 					if (*commandLine == '\0'){
-						printf("ERROR: failed to parse command line\n");
 						return NULL;
 					}
 					commandLine++;
@@ -92,12 +92,13 @@ BOOLEAN executeCommand(char** arguments);
  * ends when executeCommand returns false
  *
  * Params
- * 	void
+ * 	maxArgs
+ * 	value for the maximum amount of arguments (including the command itself) correct input can have
  *
  * Return
  * 	void
  */
-void shell_loop(){
+void shell_loop(int maxArgs){
 	char* commandLine;
 	char** arguments;
 	size_t bufsize = 256;
@@ -106,10 +107,12 @@ void shell_loop(){
 	while(notExit){
 		printf("> ");
 		getline(&commandLine, &bufsize, stdin);
-		arguments = commandSplitter(commandLine);
+		arguments = commandSplitter(commandLine, maxArgs, TRUE);
 		if (arguments){
 			notExit = executeCommand(arguments);
 			free(arguments);
 		}
+		else
+			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 	}
 }

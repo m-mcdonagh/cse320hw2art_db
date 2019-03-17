@@ -28,7 +28,7 @@ BOOLEAN executeCommand(char** args){
 			if (*++args) {
 				FILE* warehouseFile = fopen(*args, "r");
 				if (warehouseFile){
-					//loadWarehouseFile(warehouseFile);
+					loadWarehouseFile(warehouseFile);
 					fclose(warehouseFile);
 				}
 				else{
@@ -41,7 +41,7 @@ BOOLEAN executeCommand(char** args){
 			if (*++args) {
 				FILE* artFile = fopen(*args, "r");
 				if (artFile){
-					//loadArtFile(artFile);
+					loadArtFile(artFile);
 					fclose(artFile);
 				}
 				else{
@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
 		exit(1);
 	};
 
-	shell_loop();
+	shell_loop(5);
 
 	printf("DONE.\n");
 	freeAllWarehouseSFList();

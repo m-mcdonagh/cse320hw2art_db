@@ -228,6 +228,23 @@ void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
 	insertNewWarehouseList( createWarehouseList( warehouse, private ));
 }
 
+void loadWarehouseFile(FILE* warehouseFile){
+	char* commandLine = malloc(256 * sizeof(char*));
+	char** args;
+	int id;
+	int size;
+	BOOLEAN private;
+	while (fgets(commandLine, 255, warehouseFile) != NULL){
+		args = commandSplitter(commandLine, 3);
+		if (args && (args+1) && (args+2)){
+			id = atoi(*args);
+			size = atoi(*++args);
+			private = atoi(*++args);
+			insertWarehouse( createWarehouse(id, size), private);
+		}
+	}
+}
+
 /***********************************************************************************************/
 
 /*

@@ -89,3 +89,20 @@ void insertArtCollection(struct art_collection* art_collection){
 		}
 	}
 }
+
+void loadArtFile(FILE* artFile){
+	char* commandLine = malloc(256 * sizeof(char*));
+	char** args;
+	char* name;
+	int size;
+	int price;
+	while (fgets(commandLine, 255, artFile) != NULL){
+		args = commandSplitter(commandLine, 3);
+		if (args && (args+1) && (args+2)){
+			name = *args;
+			size = atoi(*++args);
+			price = atoi(*++args);
+			insertArtCollection( createArtCollection(name, size, price));
+		}
+	}
+}
