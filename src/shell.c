@@ -23,7 +23,7 @@
 char** commandSplitter(char* commandLine){
 	while (isspace(*commandLine)) commandLine++;
 	if (*commandLine == '\0'){
-		printf("> ERROR: failed to parse command line\n");
+		printf("> ERROR: not a valid command, type \"help\" for a list of commands.\n");
 		return NULL;
 	}
 	char** output = malloc(MAXARGS+1 * sizeof(char*));

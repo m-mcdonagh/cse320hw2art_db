@@ -40,11 +40,16 @@ struct warehouse_sf_list {
 
 struct warehouse_sf_list* sf_head;
 
-struct warehouse* createWarehouse(int id, int size);
-void insertWarehouse(struct warehouse* warehouse, BOOLEAN private);
-void removeWarehouse(int id);
-void freeWarehouse(struct warehouse* warehouse);
-void freeAllWarehouseSFList();
-int nextGoodID();
-void shell_loop();
+// Declarations of functions used throughout the program
+	// Defined in linked_list.c
+		struct warehouse* createWarehouse(int id, int size);
+		void insertWarehouse(struct warehouse* warehouse, BOOLEAN private);
+		void removeWarehouse(int id);
+		void freeWarehouse(struct warehouse* warehouse);
+		void freeAllWarehouseSFList();
+		int nextGoodID();
+	// Defined in shell.c
+		void shell_loop();
+		BOOLEAN executeCommand(char** args); //not actually defined, just originates (actually defined in main.c)
+
 #endif /* WAREHOUSE_H */

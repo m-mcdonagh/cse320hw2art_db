@@ -1,10 +1,39 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <getopt.h>
+#include <string.h>
 #include "warehouse.h"
 #define BOOLEAN char
 #define FALSE 0
 #define TRUE 1
+
+BOOLEAN equals(char* s1, char*s2){
+	return !strcmp(s1, s2);
+}
+
+BOOLEAN executeCommand(char** arguments){
+	if (equals(*arguments, "help")){
+	}
+	else if (equals(*arguments, "load")){
+	}
+	else if (equals(*arguments, "printall")){
+	}
+	else if (equals(*arguments, "print")){
+	}
+	else if (equals(*arguments, "add")){
+	}
+	else if (equals(*arguments, "delete")){
+	}
+	else if (equals(*arguments, "utilization")){
+	}
+	else if (equals(*arguments, "exit")){
+		return FALSE;
+	}
+	else{
+		printf("> ERROR: not a valid command, type \"help\" for a list of commands.\n");
+	}
+	return TRUE;
+}
 
 int main(int argc, char** argv) {
 	BOOLEAN quiet = FALSE;
