@@ -13,6 +13,15 @@ BOOLEAN equals(char* s1, char*s2){
 
 BOOLEAN executeCommand(char** arguments){
 	if (equals(*arguments, "help")){
+		printf("help\t\t\t\tLists available commands.\n");
+		printf("load warehouse \"filename\"\tLoads into the database warehouses from a file.\n");
+		printf("load art \"filename\"\t\tLoads into the database art collections from a file.\n");
+		printf("printall\t\t\tPrints all the art collections of the database to stdout.\n");
+		printf("print public\t\t\tPrints all the art collections of the database in public warehouses to stdout.\n");
+		printf("print private\t\t\tPrints all the art collections of the database in private warehouses to stdout.\n");
+		printf("add art \"name\" \"size\" \"price\"\tEnters a new art collection in the database of a specified name, size, and price.\n");
+		printf("delete art \"name\"\t\tRemoves any art collections with the specified name from the database.\n");
+		printf("utilization\t\t\tPrints to stdout the ratio of occupied warehouses to the total and the ratio of the total size of art collections to\n\t\t\t\t\tthe total capacity of the warehouses.\n");
 	}
 	else if (equals(*arguments, "load")){
 	}
@@ -30,7 +39,7 @@ BOOLEAN executeCommand(char** arguments){
 		return FALSE;
 	}
 	else{
-		printf("> ERROR: not a valid command, type \"help\" for a list of commands.\n");
+		printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 	}
 	return TRUE;
 }
