@@ -6,7 +6,6 @@
 #define TRUE 1
 #define FALSE 0
 
-extern struct warehouse_sf_list* sf_head;	// Head of the Segregated Free List for Warehouses
 BOOLEAN empty = TRUE;				// Value to keep track of the the elements in the Segregated Free List for initializing sf_head
 
 /*

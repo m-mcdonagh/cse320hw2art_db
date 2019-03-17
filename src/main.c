@@ -6,8 +6,6 @@
 #define FALSE 0
 #define TRUE 1
 
-extern void shell_loop();
-
 int main(int argc, char** argv) {
 	BOOLEAN quiet = FALSE;
 	FILE* warehousesFile;

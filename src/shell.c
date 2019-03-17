@@ -8,25 +8,42 @@
 #define TRUE 1
 
 
-#define MAXARGS 5
+/*
+ * commandSplitter()
+ * splits a command into its commponents, by whitespace, while keeping words within quotes (i.e. "hello there") as one argument
+ *
+ * Params
+ * 	commandLine
+ * 	pointer to a string. It's contents are changed and referenced by the return value, so it shouldn't be altered outside of this function for the return values's duration of use (done so each *output need not be free()'d)
+ *
+ * Return
+ * 	Pointer to pointers of strings, up to 5
+ */
+#define MAXARGS 5 //value to determine how many arguments are passed into the function
 char** commandSplitter(char* commandLine){
 	while (isspace(*commandLine)) commandLine++;
 	if (*commandLine == '\0'){
 		printf("> ERROR: failed to parse command line\n");
 		return NULL;
 	}
-	//commandLine = malloc(strlen(commandLine)*sizeof(char)+1);
-	char** output = calloc(MAXARGS, sizeof(char*));
-	int inputCheck = 0;
+	char** output = malloc(MAXARGS+1 * sizeof(char*));
+	for (int i=0; i<MAXARGS+1; i++)
+		output[i] = NULL;
 	int index = 0;
 	output[index] = commandLine;
 	
 	while (*++commandLine != '\0'){
 		if (isspace(*commandLine)){
+			if (*commandLine == '\n'){
+				*commandLine = '\0';
+				return output;
+			}
 			*commandLine = '\0';
 			if (index >= MAXARGS-1)
-				break;
+				return output;
 			while (isspace(*++commandLine));
+			if (*commandLine == '\0')
+				return output;
 			if (*commandLine == '\"'){
 				output[++index] = ++commandLine;
 				while (*commandLine != '\"'){
@@ -37,7 +54,7 @@ char** commandSplitter(char* commandLine){
 					commandLine++;
 				}
 				*commandLine = '\0';
-				while(isspace(*++commandLine));
+				commandLine++;
 			}
 			output[++index] = commandLine;
 		}
@@ -45,16 +62,43 @@ char** commandSplitter(char* commandLine){
 	return output;
 }
 
-BOOLEAN executeCommand(char** arguments){
-	for(int i=0; i<5; i++)
-		printf("%s\t", arguments[i]);
+/*
+ * executeCommand()
+ * must be defined separately for each program
+ *
+ * Params:
+ * 	arguments
+ * 	list of string pointers for each argument
+ *
+ * Return:
+ * 	BOOLEAN (char)
+ * 	TRUE if shell should keep executing
+ * 	FALSE if shell should terminate
+ */
+BOOLEAN executeCommand(char** arguments);
+
+/* for testing purposes on executeCommand()
+{
+	for(int i=0; arguments[i]; i++)
+		printf("%d) %s\t", i+1, arguments[i]);
 	printf("\n");
 	if (!strcmp(*arguments, "exit")){
 		return FALSE;
 	}
 	else return TRUE;
-}
+}*/
 
+/*
+ * shell_loop()
+ * runs the loop of the main program to ask for input from the user and execute accordingly
+ * ends when executeCommand returns false
+ *
+ * Params
+ * 	void
+ *
+ * Return
+ * 	void
+ */
 void shell_loop(){
 	char* commandLine;
 	char** arguments;
