@@ -80,11 +80,16 @@ BOOLEAN executeCommand(char** args){
 			printAll(0, private);
 		}
 	}
-	else if (equals(*args, "add")){
+	else if (equals(*args, "add") && *(args + 1) && *(args + 2) && *(args + 3) && *(args + 4)){
+		if (equals(*++args, "art"))
+			insertArtCollection( createArtCollection(*++args, atoi(*++args), atoi(*++args)));
 	}
-	else if (equals(*args, "delete")){
+	else if (equals(*args, "delete") && *(args + 1) && *(args + 2)){
+		if (equals(*++args, "art"))
+			removeArtCollection(*++args);
 	}
 	else if (equals(*args, "utilization")){
+		printUtilization();
 	}
 	else if (equals(*args, "exit")){
 		return FALSE;

@@ -315,3 +315,60 @@ void freeAllWarehouseSFList(){
 
 /***********************************************************************************************/
 
+void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev, struct warehouse_list* wl_prev, struct warehouse_list* wl){
+	if ((wl_prev) && (wl_prev->meta_info & 2) && !((wl->meta_info & 1) ^ (wl_prev->meta_info & 1))){
+		if ((wl->next_warehouse) && (wl->next_warehouse->meta_info & 2) && !((wl->meta_info & 1) ^ (wl->next_warehouse->meta_info & 1))){
+			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 3), wl->meta_info & 1);
+			if (wl_prev_prev){
+				wl_prev_prev->next_warehouse = wl->next_warehouse->next_warehouse;
+			}
+			else{
+				sf->warehouse_list_head = wl->next_warehouse->next_warehouse;
+				
+			}
+		}
+		else {
+			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 2), wl->meta_info & 1);
+			if (wl_prev_prev){
+				wl_prev_prev->next_warehouse = wl->next_warehouse;
+			}
+			else{
+				sf->warehouse_list_head = wl->next_warehouse;
+			}
+		}
+	}
+	else{
+		if ((wl->next_warehouse) && (wl->next_warehouse->meta_info & 2) && !((wl->meta_info & 1) ^ (wl->next_warehouse->meta_info & 1))){
+			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 2), wl->meta_info & 1);
+			if (wl_prev){
+				wl_prev->next_warehouse = wl->next_warehouse->next_warehouse;
+			}
+			else{
+				sf->warehouse_list_head = wl->next_warehouse->next_warehouse;
+			}
+		}
+		else {
+			if (wl_prev){
+				wl_prev->next_warehouse = wl->next_warehouse;
+			}
+			else{
+				sf->warehouse_list_head = wl->next_warehouse;
+			}
+		}
+	}
+}
+
+void emptyWarehouse(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev, struct warehouse_list* wl_prev, struct warehouse_list* wl){
+	wl->meta_info = wl->meta_info & -3;
+	if (wl->warehouse->art_collection){
+		if (wl->warehouse->art_collection->name)
+			free(wl->warehouse->art_collection->name);
+		free(wl->warehouse->art_collection);
+	}
+	coalesce(sf, wl_prev_prev, wl_prev, wl);
+}
+
+/***********************************************************************************************/
+
+void printUtilization(){
+}

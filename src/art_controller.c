@@ -89,6 +89,26 @@ void insertArtCollection(struct art_collection* art_collection){
 		}
 	}
 }
+extern BOOLEAN equals(char* s1, char* s2);
+void removeArtCollection(char* name){
+	struct warehouse_sf_list* sf_cursor = sf_head;
+	struct warehouse_list* wl_cursor;
+	struct warehouse_list* wl_prev;
+	struct warehouse_list* wl_prev_prev;
+	while (sf_cursor){
+		wl_prev_prev = NULL;
+		wl_prev = NULL;
+		wl_cursor = sf_cursor->warehouse_list_head;
+		while (wl_cursor){
+			if (equals(wl_cursor->warehouse->art_collection->name, name))
+				emptyWarehouse(sf_cursor, wl_prev_prev, wl_prev, wl_cursor);
+			wl_prev_prev = wl_prev;
+			wl_prev = wl_cursor;
+			wl_cursor = wl_cursor->next_warehouse;
+		}
+		sf_cursor = sf_cursor->sf_next_warehouse;
+	}
+}
 
 /*
  * loadArtFile()
@@ -158,6 +178,7 @@ void printAll(BOOLEAN all, BOOLEAN private){
 		}
 		sf_head = sf_head->sf_next_warehouse;
 	}
+	printf("%d\n", total);
 }
 
 struct art_collection_list{
@@ -167,12 +188,14 @@ struct art_collection_list{
 
 void printAndFreeACL(struct art_collection_list* acl_cursor){
 	struct art_collection_list* acl_prev;
+	int total = 0;
 	while (acl_cursor){
 		printArtCollection(acl_cursor->art_collection);
 		acl_prev = acl_cursor;
 		free(acl_prev);
 		acl_cursor = acl_cursor->next;
 	}
+	printf("%d\n", total);
 }
 
 void printBySize(BOOLEAN all, BOOLEAN private){
