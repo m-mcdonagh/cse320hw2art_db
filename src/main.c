@@ -11,6 +11,9 @@ BOOLEAN equals(char* s1, char*s2){
 	return !strcmp(s1, s2);
 }
 
+BOOLEAN sizeSort = FALSE;
+BOOLEAN priceSort = FALSE;
+
 BOOLEAN executeCommand(char** args){
 	if (equals(*args, "help")){
 		printf("help\t\t\t\tLists available commands.\n");
@@ -55,8 +58,27 @@ BOOLEAN executeCommand(char** args){
 		}
 	}
 	else if (equals(*args, "printall")){
+		if (sizeSort){
+			printBySize(1, 1);
+		}
+		else if (priceSort){
+			printByPrice(1, 1);
+		}
+		else{
+			printAll(1, 1);
+		}	
 	}
 	else if (equals(*args, "print")){
+		BOOLEAN private = equals(*++args, "private");
+		if (sizeSort){
+			printBySize(0, private);
+		}
+		else if (priceSort){
+			printByPrice(0, private);
+		}
+		else{
+			printAll(0, private);
+		}
 	}
 	else if (equals(*args, "add")){
 	}
@@ -77,8 +99,6 @@ int main(int argc, char** argv) {
 	BOOLEAN quiet = FALSE;
 	FILE* warehousesFile;
 	FILE* art_collectionsFile;
-	BOOLEAN sizeSort = FALSE;
-	BOOLEAN priceSort = FALSE;
 	int opt;
 	while ((opt = getopt(argc, argv, "qw:a:s:")) != -1){
 		switch (opt){

@@ -59,7 +59,7 @@ void insertArtCollection(struct art_collection* art_collection){
 				return;
 			}
 			wl_cursor = sf_cursor->warehouse_list_head;
-			
+			wl_prev = NULL;
 		}
 		while(wl_cursor){
 			if ((wl_cursor->meta_info) & 2){
@@ -90,6 +90,17 @@ void insertArtCollection(struct art_collection* art_collection){
 	}
 }
 
+/*
+ * loadArtFile()
+ * inserts into the database art collections from a specified file each of the format: "%s %d %d\n", name, size, price
+ *
+ * Params:
+ * 	artFile
+ * 	pointer to the file to be read
+ *
+ * Return:
+ * 	void
+ */
 void loadArtFile(FILE* artFile){
 	char* commandLine = malloc(256 * sizeof(char*));
 	char** args;
@@ -105,4 +116,167 @@ void loadArtFile(FILE* artFile){
 			insertArtCollection( createArtCollection(name, size, price));
 		}
 	}
+}
+
+/*
+ * printArtCollection()
+ * prints the info of the specified art collection to stdout
+ *
+ * Params:
+ * 	artC
+ * 	the art collection to be printed
+ *
+ * Return:
+ * 	void
+ */
+void printArtCollection(struct art_collection* artC){
+	printf("%s %d %d", artC->name, artC->size,  artC->price);
+}
+
+/*
+ * printAll()
+ * prints the info of all art collections of the database to stdout
+ *
+ * Params:
+ * 	void
+ *
+ * Return:
+ * 	void
+ */
+void printAll(BOOLEAN all, BOOLEAN private){
+	struct warehouse_sf_list* sf_cursor = sf_head;
+	struct warehouse_list* wl_cursor;
+	int total = 0;
+	while (sf_head){
+		wl_cursor = sf_cursor->warehouse_list_head;
+		while(wl_cursor){
+			if (((wl_cursor->meta_info) & 2) && (all  || !((wl_cursor->meta_info) ^ private))){
+				printArtCollection( wl_cursor->warehouse->art_collection);
+				total += wl_cursor->warehouse->art_collection->price;
+			}
+			wl_cursor = wl_cursor->next_warehouse;
+		}
+		sf_head = sf_head->sf_next_warehouse;
+	}
+}
+
+struct art_collection_list{
+	struct art_collection* art_collection;
+	struct art_collection_list* next;
+};
+
+void printAndFreeACL(struct art_collection_list* acl_cursor){
+	struct art_collection_list* acl_prev;
+	while (acl_cursor){
+		printArtCollection(acl_cursor->art_collection);
+		acl_prev = acl_cursor;
+		free(acl_prev);
+		acl_cursor = acl_cursor->next;
+	}
+}
+
+void printBySize(BOOLEAN all, BOOLEAN private){
+	struct warehouse_sf_list* sf_cursor = sf_head;
+	struct warehouse_list* wl_cursor;
+	struct art_collection_list* acl_head = NULL;
+	struct art_collection_list* acl_cursor = NULL;
+	struct art_collection_list* acl_prev;
+	struct art_collection_list* acl_new;
+	while (sf_cursor){
+		wl_cursor = sf_cursor->warehouse_list_head;
+		while(wl_cursor){
+			if (((wl_cursor->meta_info) & 2) && (all || !((wl_cursor->meta_info) ^ private))){
+				if (acl_head){
+					if (acl_head->art_collection->size > wl_cursor->warehouse->art_collection->size){
+						acl_new = malloc(sizeof(struct art_collection_list));
+						acl_new->art_collection = wl_cursor->warehouse->art_collection;
+						acl_new->next = acl_head;
+						acl_head = acl_new;
+					}
+					else{
+						acl_cursor = acl_head->next;
+						acl_prev = acl_head;
+						while (acl_cursor){
+							if (acl_cursor->art_collection->size > wl_cursor->warehouse->art_collection->size){
+								acl_new = malloc(sizeof(struct art_collection_list));
+								acl_new->art_collection = wl_cursor->warehouse->art_collection;
+								acl_new->next = acl_cursor;
+								acl_prev->next = acl_new;
+								break;
+							}
+							acl_prev = acl_cursor;
+							acl_cursor = acl_cursor->next;
+						}
+						if (!acl_cursor){ 
+							acl_new = malloc(sizeof(struct art_collection_list));
+							acl_new->art_collection = wl_cursor->warehouse->art_collection;
+							acl_new->next = NULL;
+							acl_prev->next = acl_new;
+						}
+					}
+				}
+				else{
+					acl_head = malloc(sizeof(struct art_collection_list));
+					acl_head->art_collection = wl_cursor->warehouse->art_collection;
+					acl_head->next = NULL;
+				}
+			}
+		wl_cursor = wl_cursor->next_warehouse;
+		}
+	sf_cursor = sf_cursor->sf_next_warehouse;
+	}
+	printAndFreeACL(acl_head);
+}
+
+void printByPrice(BOOLEAN all, BOOLEAN private){	
+	struct warehouse_sf_list* sf_cursor = sf_head;
+	struct warehouse_list* wl_cursor;
+	struct art_collection_list* acl_head = NULL;
+	struct art_collection_list* acl_cursor = NULL;
+	struct art_collection_list* acl_prev;
+	struct art_collection_list* acl_new;
+	while (sf_cursor){
+		wl_cursor = sf_cursor->warehouse_list_head;
+		while(wl_cursor){
+			if (((wl_cursor->meta_info) & 2) && (all || !((wl_cursor->meta_info) ^ private))){
+				if (acl_head){
+					if (acl_head->art_collection->price > wl_cursor->warehouse->art_collection->price){
+						acl_new = malloc(sizeof(struct art_collection_list));
+						acl_new->art_collection = wl_cursor->warehouse->art_collection;
+						acl_new->next = acl_head;
+						acl_head = acl_new;
+					}
+					else{
+						acl_cursor = acl_head->next;
+						acl_prev = acl_head;
+						while (acl_cursor){
+							if (acl_cursor->art_collection->price > wl_cursor->warehouse->art_collection->price){
+								acl_new = malloc(sizeof(struct art_collection_list));
+								acl_new->art_collection = wl_cursor->warehouse->art_collection;
+								acl_new->next = acl_cursor;
+								acl_prev->next = acl_new;
+								break;
+							}
+							acl_prev = acl_cursor;
+							acl_cursor = acl_cursor->next;
+						}
+						if (!acl_cursor){ 
+							acl_new = malloc(sizeof(struct art_collection_list));
+							acl_new->art_collection = wl_cursor->warehouse->art_collection;
+							acl_new->next = NULL;
+							acl_prev->next = acl_new;
+						}
+					}
+				}
+				else{
+					acl_head = malloc(sizeof(struct art_collection_list));
+					acl_head->art_collection = wl_cursor->warehouse->art_collection;
+					acl_head->next = NULL;
+				}
+			}
+		wl_cursor = wl_cursor->next_warehouse;
+		}
+	sf_cursor = sf_cursor->sf_next_warehouse;
+	}
+	printAndFreeACL(acl_head);
 }

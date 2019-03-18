@@ -54,6 +54,9 @@ struct warehouse_sf_list* sf_head;
 
 	// Defined in art_controller.c
 		void loadArtFile(FILE* artFile);
+		void printAll(BOOLEAN all, BOOLEAN private);
+		void printBySize(BOOLEAN all, BOOLEAN private);
+		void printByPrice(BOOLEAN all, BOOLEAN private);
 
 	// Defined in shell.c
 		void shell_loop(int maxArgs);
