@@ -267,6 +267,11 @@ void freeWarehouse(struct warehouse* warehouse){
 	free(warehouse);
 }
 
+void freeWarehouseList(struct warehouse_list* wl){
+	freeWarehouse(wl->warehouse);
+	free(wl);
+}
+
 /*
  * freeAllWarehouseList()
  * frees all the warehouse of the same class size
@@ -282,10 +287,9 @@ void freeAllWarehouseList(struct warehouse_list* warehouse_list_head){
 	struct warehouse_list* cursor = warehouse_list_head;
 	struct warehouse_list* temp;
 	while (cursor){
-		freeWarehouse(cursor->warehouse);
 		temp = cursor;
 		cursor = cursor->next_warehouse;
-		free(temp);
+		freeWarehouseList(temp);
 	}
 }
 
@@ -324,8 +328,10 @@ void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev,
 			}
 			else{
 				sf->warehouse_list_head = wl->next_warehouse->next_warehouse;
-				
 			}
+			freeWarehouseList(wl->next_warehouse);
+			freeWarehouseList(wl);
+			freeWarehouseList(wl_prev);
 		}
 		else {
 			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 2), wl->meta_info & 1);
@@ -335,6 +341,8 @@ void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev,
 			else{
 				sf->warehouse_list_head = wl->next_warehouse;
 			}
+			freeWarehouseList(wl);
+			freeWarehouseList(wl_prev);
 		}
 	}
 	else{
@@ -346,6 +354,8 @@ void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev,
 			else{
 				sf->warehouse_list_head = wl->next_warehouse->next_warehouse;
 			}
+			freeWarehouseList(wl->next_warehouse);
+			freeWarehouseList(wl);
 		}
 		else {
 			if (wl_prev){
@@ -354,6 +364,7 @@ void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev,
 			else{
 				sf->warehouse_list_head = wl->next_warehouse;
 			}
+			freeWarehouseList(wl);
 		}
 	}
 }

@@ -101,6 +101,7 @@ BOOLEAN executeCommand(char** args){
 }
 
 int main(int argc, char** argv) {
+	sf_head = NULL;
 	BOOLEAN quiet = FALSE;
 	FILE* warehousesFile;
 	FILE* art_collectionsFile;

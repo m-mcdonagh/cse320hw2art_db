@@ -41,6 +41,10 @@ struct art_collection* createArtCollection(char* name, int size, int price){
  * 	void
  */
 void insertArtCollection(struct art_collection* art_collection){
+	if (!sf_head){
+		printf("ERROR: There exist no warehouse in the database!\n");
+		return;
+	}
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	while (sf_cursor->class_size < art_collection->size){
 		sf_cursor = sf_cursor->sf_next_warehouse;
@@ -95,19 +99,26 @@ void removeArtCollection(char* name){
 	struct warehouse_list* wl_cursor;
 	struct warehouse_list* wl_prev;
 	struct warehouse_list* wl_prev_prev;
+	int count = 0;
 	while (sf_cursor){
 		wl_prev_prev = NULL;
 		wl_prev = NULL;
 		wl_cursor = sf_cursor->warehouse_list_head;
 		while (wl_cursor){
-			if (equals(wl_cursor->warehouse->art_collection->name, name))
+			if ((wl_cursor->warehouse->art_collection) && (equals(wl_cursor->warehouse->art_collection->name, name))){
 				emptyWarehouse(sf_cursor, wl_prev_prev, wl_prev, wl_cursor);
+				count++;
+			}
 			wl_prev_prev = wl_prev;
 			wl_prev = wl_cursor;
 			wl_cursor = wl_cursor->next_warehouse;
 		}
 		sf_cursor = sf_cursor->sf_next_warehouse;
 	}
+	if (count)
+		printf("%d instance%s of %s found and deleted.\n", count, (count==1) ? "" : "s", name);
+	else
+		printf("No instances of %s found, nothing deleted.\n");
 }
 
 /*
