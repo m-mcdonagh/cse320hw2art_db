@@ -389,4 +389,25 @@ void emptyWarehouse(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev
 /***********************************************************************************************/
 
 void printUtilization(){
+	struct warehouse_sf_list* sf_cursor = sf_head;
+	struct warehouse_list* wl_cursor;
+	double numOccupied = 0;
+	double totalWarehouse = 0;
+	double totalArtSize = 0;
+	double warehouseCapacity = 0;
+	while(sf_cursor){
+		wl_cursor = sf_cursor->warehouse_list_head;
+		while(wl_cursor){
+			totalWarehouse++;
+			warehouseCapacity += wl_cursor->warehouse->size;
+			if (wl_cursor->meta_info & 2){
+				numOccupied++;
+				totalArtSize += wl_cursor->warehouse->art_collection->size;
+			}
+			wl_cursor = wl_cursor->next_warehouse;
+		}
+		sf_cursor = sf_cursor->sf_next_warehouse;
+	}
+	printf("%f\n", numOccupied/totalWarehouse);
+	printf("%f\n", totalArtSize/warehouseCapacity);
 }
