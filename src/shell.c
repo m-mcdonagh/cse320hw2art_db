@@ -28,7 +28,8 @@ char** commandSplitter(char* commandLine, int maxArgs, BOOLEAN userInput){
 		return NULL;
 	}
 	char** output = malloc((maxArgs+1)*sizeof(char *));
-	for (int i=0; i<(maxArgs+1); i++)
+	int i;
+	for (i=0; i<(maxArgs+1); i++)
 		output[i] = NULL;
 	int index = 0;
 	output[index] = commandLine;
