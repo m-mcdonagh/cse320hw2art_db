@@ -27,7 +27,9 @@ char** commandSplitter(char* commandLine, int maxArgs, BOOLEAN userInput){
 	if (*commandLine == '\0'){
 		return NULL;
 	}
-	char** output = calloc(maxArgs+1 ,sizeof(char *));
+	char** output = malloc((maxArgs+1)*sizeof(char *));
+	for (int i=0; i<(maxArgs+1); i++)
+		output[i] = NULL;
 	int index = 0;
 	output[index] = commandLine;
 	
@@ -47,6 +49,7 @@ char** commandSplitter(char* commandLine, int maxArgs, BOOLEAN userInput){
 				output[++index] = ++commandLine;
 				while (*commandLine != '\"'){
 					if (*commandLine == '\0'){
+						free(output);
 						return NULL;
 					}
 					commandLine++;
@@ -99,20 +102,22 @@ BOOLEAN executeCommand(char** arguments);
  * 	void
  */
 void shell_loop(int maxArgs){
-	char* commandLine;
-	char** arguments;
-	size_t bufsize = 256;
+	char* commandLine = NULL;
+	char** args;
+	size_t bufsize = 0;
 	BOOLEAN notExit = TRUE;
 	
 	while(notExit){
 		printf("> ");
 		getline(&commandLine, &bufsize, stdin);
-		arguments = commandSplitter(commandLine, maxArgs, TRUE);
-		if (arguments){
-			notExit = executeCommand(arguments);
-			free(arguments);
+		args = commandSplitter(commandLine, maxArgs, TRUE);
+		if (args){
+			notExit = executeCommand(args);
+			free(args);
 		}
 		else
 			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
+		free(commandLine);
+		commandLine = NULL;
 	}
 }

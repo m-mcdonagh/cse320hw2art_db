@@ -239,11 +239,14 @@ void loadWarehouseFile(FILE* warehouseFile){
 		args = commandSplitter(commandLine, 3);
 		if (args && (args+1) && (args+2)){
 			id = atoi(*args);
-			size = atoi(*++args);
-			private = atoi(*++args);
+			size = atoi(*(args+1));
+			private = atoi(*(args+2));
 			insertWarehouse( createWarehouse(id, size), private);
 		}
+		if (args)
+			free(args);
 	}
+	free(commandLine);
 }
 
 /***********************************************************************************************/

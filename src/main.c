@@ -87,8 +87,6 @@ BOOLEAN executeCommand(char** args){
 			int price = atoi(*++args);
 			struct art_collection* artC = createArtCollection(name, size, price);
 			insertArtCollection( artC );
-			printf("Added ");
-			printArtCollection( artC );
 		}
 	}
 	else if (equals(*args, "delete") && *(args + 1) && *(args + 2)){

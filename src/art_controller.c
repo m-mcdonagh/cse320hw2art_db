@@ -43,12 +43,18 @@ struct art_collection* createArtCollection(char* name, int size, int price){
 void insertArtCollection(struct art_collection* art_collection){
 	if (!sf_head){
 		printf("ERROR: There exist no warehouse in the database!\n");
+		if (art_collection->name)
+			free(art_collection->name);
+		free(art_collection);
 		return;
 	}
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	while (sf_cursor->class_size < art_collection->size){
 		sf_cursor = sf_cursor->sf_next_warehouse;
 		if (!sf_cursor){
+			if (art_collection->name)
+				free(art_collection->name);
+			free(art_collection);
 			printf("ERROR: There exists no unoccupied warehouse large enough to fit Art Collection \"%s\".\n", art_collection->name);
 			return;
 		}
@@ -59,6 +65,9 @@ void insertArtCollection(struct art_collection* art_collection){
 		while (!wl_cursor){
 			sf_cursor = sf_cursor->sf_next_warehouse;
 			if (!sf_cursor){
+				if (art_collection->name)
+					free(art_collection->name);
+				free(art_collection);
 				printf("ERROR: There exists no Warehouse large enough to fit Art Collection \"%s\".\n", art_collection->name);
 				return;
 			}
@@ -71,7 +80,12 @@ void insertArtCollection(struct art_collection* art_collection){
 				wl_cursor = wl_cursor->next_warehouse;
 			}
 			else{
-				int newSize = sf_cursor->class_size - art_collection->size;
+				int artSize = art_collection->size;
+				if (art_collection->size % 2)
+					artSize++;
+				if (artSize < 4)
+					artSize = 4;
+				int newSize = sf_cursor->class_size - artSize;
 				if (newSize < 4){
 					wl_cursor->warehouse->art_collection = art_collection;
 					wl_cursor->meta_info = wl_cursor->meta_info | 2;
@@ -82,8 +96,8 @@ void insertArtCollection(struct art_collection* art_collection){
 						wl_prev->next_warehouse = wl_cursor->next_warehouse;
 					else 
 						sf_cursor->warehouse_list_head = wl_cursor->next_warehouse;
-					insertWarehouse(createWarehouse(	wl_cursor->warehouse->id, 	art_collection->size),	wl_cursor->meta_info&1);
-					insertWarehouse(createWarehouse(	nextGoodID(),			newSize),		wl_cursor->meta_info&1);
+					insertWarehouse(createWarehouse(	wl_cursor->warehouse->id, 	artSize),	wl_cursor->meta_info&1);
+					insertWarehouse(createWarehouse(	nextGoodID(),			newSize),	wl_cursor->meta_info&1);
 					freeWarehouse(wl_cursor->warehouse);
 					free(wl_cursor);
 					insertArtCollection(art_collection);
@@ -144,11 +158,14 @@ void loadArtFile(FILE* artFile){
 		args = commandSplitter(commandLine, 3);
 		if (args && (args+1) && (args+2)){
 			name = *args;
-			size = atoi(*++args);
-			price = atoi(*++args);
+			size = atoi(*(args+1));
+			price = atoi(*(args+2));
 			insertArtCollection( createArtCollection(name, size, price));
 		}
+		if (args)
+			free(args);
 	}
+	free(commandLine);
 }
 
 /*
