@@ -200,7 +200,7 @@ void printAll(BOOLEAN all, BOOLEAN private){
 	while (sf_cursor){
 		wl_cursor = sf_cursor->warehouse_list_head;
 		while(wl_cursor){
-			if (((wl_cursor->meta_info) & 2) && (all  || !((wl_cursor->meta_info) ^ private))){
+			if (((wl_cursor->meta_info) & 2) && (all  || !((wl_cursor->meta_info & 1) ^ private))){
 				printArtCollection( wl_cursor->warehouse->art_collection);
 				total += wl_cursor->warehouse->art_collection->price;
 			}
@@ -238,7 +238,7 @@ void printBySize(BOOLEAN all, BOOLEAN private){
 	while (sf_cursor){
 		wl_cursor = sf_cursor->warehouse_list_head;
 		while(wl_cursor){
-			if (((wl_cursor->meta_info) & 2) && (all || !((wl_cursor->meta_info) ^ private))){
+			if (((wl_cursor->meta_info) & 2) && (all || !((wl_cursor->meta_info & 1) ^ private))){
 				if (acl_head){
 					if (acl_head->art_collection->size > wl_cursor->warehouse->art_collection->size){
 						acl_new = malloc(sizeof(struct art_collection_list));

@@ -69,16 +69,20 @@ BOOLEAN executeCommand(char** args){
 		}	
 	}
 	else if (equals(*args, "print")){
-		BOOLEAN private = equals(*++args, "private");
-		if (sizeSort){
-			printBySize(0, private);
+		if (++args && equals(*args, "private") || equals(*args,  "public")){
+			BOOLEAN private = equals(*args, "private");
+			if (sizeSort){
+				printBySize(0, private);
+			}
+			else if (priceSort){
+				printByPrice(0, private);
+			}
+			else{
+				printAll(0, private);
+			}
 		}
-		else if (priceSort){
-			printByPrice(0, private);
-		}
-		else{
-			printAll(0, private);
-		}
+		else 
+			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 	}
 	else if (equals(*args, "add") && *(args + 1) && *(args + 2) && *(args + 3) && *(args + 4)){
 		if (equals(*++args, "art")){
