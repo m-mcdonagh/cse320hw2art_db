@@ -111,6 +111,8 @@ void removeArtCollection(char* name){
 			}
 			wl_prev_prev = wl_prev;
 			wl_prev = wl_cursor;
+			long int size = (wl_cursor->meta_info & -4) >> 1;
+			//printf("\twarehouse %d\n\t\tof size %ld\n\t\t%s with %s in it\n", wl_cursor->warehouse->id, size, (wl_cursor->meta_info & 1)?"Private":"Public", (wl_cursor->meta_info & 2)? wl_cursor->warehouse->art_collection->name : "nothing");
 			wl_cursor = wl_cursor->next_warehouse;
 		}
 		sf_cursor = sf_cursor->sf_next_warehouse;
@@ -118,7 +120,7 @@ void removeArtCollection(char* name){
 	if (count)
 		printf("%d instance%s of %s found and deleted.\n", count, (count==1) ? "" : "s", name);
 	else
-		printf("No instances of %s found, nothing deleted.\n");
+		printf("No instances of %s found, nothing deleted.\n", name);
 }
 
 /*
@@ -161,7 +163,7 @@ void loadArtFile(FILE* artFile){
  * 	void
  */
 void printArtCollection(struct art_collection* artC){
-	printf("%s %d %d", artC->name, artC->size,  artC->price);
+	printf("%s %d %d\n", artC->name, artC->size,  artC->price);
 }
 
 /*
@@ -178,7 +180,7 @@ void printAll(BOOLEAN all, BOOLEAN private){
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	struct warehouse_list* wl_cursor;
 	int total = 0;
-	while (sf_head){
+	while (sf_cursor){
 		wl_cursor = sf_cursor->warehouse_list_head;
 		while(wl_cursor){
 			if (((wl_cursor->meta_info) & 2) && (all  || !((wl_cursor->meta_info) ^ private))){
@@ -187,7 +189,7 @@ void printAll(BOOLEAN all, BOOLEAN private){
 			}
 			wl_cursor = wl_cursor->next_warehouse;
 		}
-		sf_head = sf_head->sf_next_warehouse;
+		sf_cursor = sf_cursor->sf_next_warehouse;
 	}
 	printf("%d\n", total);
 }

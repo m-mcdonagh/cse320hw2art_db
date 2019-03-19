@@ -1,0 +1,3 @@
+michael 6 100
+elinor 6 200
+michael 6 150

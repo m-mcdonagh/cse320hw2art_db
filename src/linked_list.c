@@ -6,8 +6,6 @@
 #define TRUE 1
 #define FALSE 0
 
-BOOLEAN empty = TRUE;				// Value to keep track of the the elements in the Segregated Free List for initializing sf_head
-
 /*
  * badInt()
  * Checks to see if the ID is valid
@@ -27,7 +25,7 @@ BOOLEAN badID(int id, BOOLEAN userInput){
 			printf("ERROR: All ID's must be positive. %d is not!\n", id);
 		return TRUE;
 	}
-	if (empty)
+	if (!sf_head)
 		return FALSE;
 	else{
 		struct warehouse_sf_list* sf_cursor = sf_head;
@@ -149,9 +147,8 @@ struct warehouse_sf_list* createWarehouseSFList(int class_size, struct warehouse
 void insertWarehouseSFList(struct warehouse_sf_list* toBeInserted){
 	if (!toBeInserted)
 		return;
-	if (empty){
+	if (!sf_head){
 		sf_head = toBeInserted;
-		empty=FALSE;
 	}
 	else{
 		if (sf_head->class_size > toBeInserted->class_size){
@@ -191,7 +188,9 @@ void insertNewWarehouseList(struct warehouse_list* warehouse_list){
 		return;
 	int class_size = (warehouse_list->meta_info >> 1) & -2;
 	
-	insertWarehouseSFList( createWarehouseSFList( class_size, warehouse_list ));
+	struct warehouse_sf_list* new_sf = createWarehouseSFList( class_size, warehouse_list );
+	insertWarehouseSFList(new_sf);
+	new_sf->warehouse_list_head = warehouse_list;
 }
 
 /*
@@ -209,7 +208,7 @@ void insertNewWarehouseList(struct warehouse_list* warehouse_list){
  * 	void
  */
 void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
-	if (empty){
+	if (!sf_head){
 		insertNewWarehouseList( createWarehouseList( warehouse, private ));
 		return;
 	}
@@ -304,7 +303,7 @@ void freeAllWarehouseList(struct warehouse_list* warehouse_list_head){
  * 	void
  */
 void freeAllWarehouseSFList(){
-	if (empty)
+	if (!sf_head)
 		return;
 	struct warehouse_sf_list* cursor = sf_head;
 	struct warehouse_sf_list* temp;
