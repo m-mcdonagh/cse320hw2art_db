@@ -78,12 +78,12 @@ void insertArtCollection(struct art_collection* art_collection){
 					return;
 				}
 				else{
-					insertWarehouse(createWarehouse(	wl_cursor->warehouse->id, 	art_collection->size),	wl_cursor->meta_info&1);
-					insertWarehouse(createWarehouse(	nextGoodID(),			newSize),		wl_cursor->meta_info&1);
 					if (wl_prev)
 						wl_prev->next_warehouse = wl_cursor->next_warehouse;
 					else 
 						sf_cursor->warehouse_list_head = wl_cursor->next_warehouse;
+					insertWarehouse(createWarehouse(	wl_cursor->warehouse->id, 	art_collection->size),	wl_cursor->meta_info&1);
+					insertWarehouse(createWarehouse(	nextGoodID(),			newSize),		wl_cursor->meta_info&1);
 					freeWarehouse(wl_cursor->warehouse);
 					free(wl_cursor);
 					insertArtCollection(art_collection);

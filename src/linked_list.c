@@ -208,6 +208,8 @@ void insertNewWarehouseList(struct warehouse_list* warehouse_list){
  * 	void
  */
 void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
+	if (!warehouse)
+		return;
 	if (!sf_head){
 		insertNewWarehouseList( createWarehouseList( warehouse, private ));
 		return;
@@ -267,7 +269,8 @@ void freeWarehouse(struct warehouse* warehouse){
 }
 
 void freeWarehouseList(struct warehouse_list* wl){
-	freeWarehouse(wl->warehouse);
+	if (wl->warehouse)
+		freeWarehouse(wl->warehouse);
 	free(wl);
 }
 
@@ -319,40 +322,42 @@ void freeAllWarehouseSFList(){
 /***********************************************************************************************/
 
 void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev, struct warehouse_list* wl_prev, struct warehouse_list* wl){
-	if ((wl_prev) && (wl_prev->meta_info & 2) && !((wl->meta_info & 1) ^ (wl_prev->meta_info & 1))){
-		if ((wl->next_warehouse) && (wl->next_warehouse->meta_info & 2) && !((wl->meta_info & 1) ^ (wl->next_warehouse->meta_info & 1))){
-			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 3), wl->meta_info & 1);
+
+	if ((wl_prev) && !(wl_prev->meta_info & 2) && !((wl->meta_info & 1) ^ (wl_prev->meta_info & 1))){
+		
+		if ((wl->next_warehouse) && !(wl->next_warehouse->meta_info & 2) && !((wl->meta_info & 1) ^ (wl->next_warehouse->meta_info & 1))){
 			if (wl_prev_prev){
 				wl_prev_prev->next_warehouse = wl->next_warehouse->next_warehouse;
 			}
 			else{
 				sf->warehouse_list_head = wl->next_warehouse->next_warehouse;
 			}
+			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 3), wl->meta_info & 1);
 			freeWarehouseList(wl->next_warehouse);
 			freeWarehouseList(wl);
 			freeWarehouseList(wl_prev);
 		}
 		else {
-			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 2), wl->meta_info & 1);
 			if (wl_prev_prev){
 				wl_prev_prev->next_warehouse = wl->next_warehouse;
 			}
 			else{
 				sf->warehouse_list_head = wl->next_warehouse;
 			}
+			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 2), wl->meta_info & 1);
 			freeWarehouseList(wl);
 			freeWarehouseList(wl_prev);
 		}
 	}
 	else{
-		if ((wl->next_warehouse) && (wl->next_warehouse->meta_info & 2) && !((wl->meta_info & 1) ^ (wl->next_warehouse->meta_info & 1))){
-			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 2), wl->meta_info & 1);
+		if ((wl->next_warehouse) && !(wl->next_warehouse->meta_info & 2) && !((wl->meta_info & 1) ^ (wl->next_warehouse->meta_info & 1))){
 			if (wl_prev){
 				wl_prev->next_warehouse = wl->next_warehouse->next_warehouse;
 			}
 			else{
 				sf->warehouse_list_head = wl->next_warehouse->next_warehouse;
 			}
+			insertWarehouse( createWarehouse( wl->warehouse->id, wl->warehouse->size * 2), wl->meta_info & 1);
 			freeWarehouseList(wl->next_warehouse);
 			freeWarehouseList(wl);
 		}
@@ -363,7 +368,7 @@ void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev,
 			else{
 				sf->warehouse_list_head = wl->next_warehouse;
 			}
-			freeWarehouseList(wl);
+			//freeWarehouseList(wl);
 		}
 	}
 }
