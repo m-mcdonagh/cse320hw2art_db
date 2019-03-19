@@ -112,8 +112,8 @@ BOOLEAN executeCommand(char** args){
 int main(int argc, char** argv) {
 	sf_head = NULL;
 	BOOLEAN quiet = FALSE;
-	FILE* warehousesFile;
-	FILE* art_collectionsFile;
+	FILE* warehouseFile;
+	FILE* artFile;
 	int opt;
 	while ((opt = getopt(argc, argv, "qw:a:s:")) != -1){
 		switch (opt){
@@ -125,8 +125,8 @@ int main(int argc, char** argv) {
 					printf("ERROR: warehouses files can only be opened by commandline when in quiet mode (-q).\n");
 					exit(1);
 				}
-				warehousesFile = fopen(optarg, "r");
-				if (!warehousesFile){
+				warehouseFile = fopen(optarg, "r");
+				if (!warehouseFile){
 					printf("ERROR: failed to open Warehouses File \"%s\".\n", optarg);
 					exit(1);
 				}
@@ -136,8 +136,8 @@ int main(int argc, char** argv) {
 					printf("ERROR: art collections files can only be opened by commandline when in quiet mode (-q).\n");
 					exit(1);
 				}
-				art_collectionsFile = fopen(optarg, "r");
-				if (!art_collectionsFile){
+				artFile = fopen(optarg, "r");
+				if (!artFile){
 					printf("ERROR: failed to open Art Collections File \"%s\".\n", optarg);
 					exit(1);
 				}
@@ -156,12 +156,19 @@ int main(int argc, char** argv) {
 			      exit(1);
 		}
 	}
-	if (quiet && (!warehousesFile || !art_collectionsFile)){
-		printf("ERROR: no Query Provided\n");
+	if (quiet && (!warehouseFile || !artFile)){
+		printf("ERROR: no Query Provided. Quiet mode needs both a warehouse file (-w \"filename\") and an art file (-a \"filename\")\n");
 		exit(1);
 	};
-
-	shell_loop(5);
+	if (quiet){	
+		loadWarehouseFile(warehouseFile);
+		fclose(warehouseFile);
+		loadArtFile(artFile);
+		fclose(artFile);
+		printAll(1, 1);
+	}
+	else
+		shell_loop(5);
 
 	printf("DONE.\n");
 	freeAllWarehouseSFList();
