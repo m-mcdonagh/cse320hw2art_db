@@ -48,7 +48,7 @@ struct warehouse_sf_list* sf_head;
 		
 		void emptyWarehouse(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev, struct warehouse_list* wl_prev, struct warehouse_list* wl);
 		void removeWarehouse(int id);
-		void freeWarehouse(struct warehouse* warehouse);
+		void freeWarehouseList(struct warehouse_list* wl);
 		void freeAllWarehouseSFList();
 		
 		int nextGoodID();
@@ -60,7 +60,7 @@ struct warehouse_sf_list* sf_head;
 		
 		struct art_collection* createArtCollection(char* name, int size, int price);
 		void insertArtCollection(struct art_collection* art_collection);
-		void removeArtCollection(char* name);
+		void removeArtCollection(char* name, int count);
 		
 		void printArtCollection(struct art_collection* artC);
 		void printAll(BOOLEAN all, BOOLEAN private);

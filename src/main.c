@@ -53,9 +53,8 @@ BOOLEAN executeCommand(char** args){
 			}
 			else printf("ERROR: no file specified\n");
 		}
-		else{
+		else
 			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
-		}
 	}
 	else if (equals(*args, "printall")){
 		if (sizeSort){
@@ -92,10 +91,14 @@ BOOLEAN executeCommand(char** args){
 			struct art_collection* artC = createArtCollection(name, size, price);
 			insertArtCollection( artC );
 		}
+		else
+			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 	}
 	else if (equals(*args, "delete") && *(args + 1) && *(args + 2)){
 		if (equals(*++args, "art"))
-			removeArtCollection(*++args);
+			removeArtCollection(*++args, 0);
+		else
+			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 	}
 	else if (equals(*args, "utilization")){
 		printUtilization();
@@ -159,7 +162,7 @@ int main(int argc, char** argv) {
 	if (quiet && (!warehouseFile || !artFile)){
 		printf("ERROR: no Query Provided. Quiet mode needs both a warehouse file (-w \"filename\") and an art file (-a \"filename\")\n");
 		exit(1);
-	};
+	}
 	if (quiet){	
 		loadWarehouseFile(warehouseFile);
 		fclose(warehouseFile);

@@ -218,6 +218,10 @@ void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
 	while (sf_cursor){
 		if (sf_cursor->class_size == warehouse->size){
 			struct warehouse_list* wl_cursor = sf_cursor->warehouse_list_head;
+			if (!wl_cursor){
+				sf_cursor->warehouse_list_head = createWarehouseList(warehouse, private);
+				return;
+			}
 			while (wl_cursor->next_warehouse){
 				wl_cursor = wl_cursor->next_warehouse;
 			}
@@ -371,18 +375,13 @@ void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev,
 			else{
 				sf->warehouse_list_head = wl->next_warehouse;
 			}
-			//freeWarehouseList(wl);
+			freeWarehouseList(wl);
 		}
 	}
 }
 
 void emptyWarehouse(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev, struct warehouse_list* wl_prev, struct warehouse_list* wl){
 	wl->meta_info = wl->meta_info & -3;
-	if (wl->warehouse->art_collection){
-		if (wl->warehouse->art_collection->name)
-			free(wl->warehouse->art_collection->name);
-		free(wl->warehouse->art_collection);
-	}
 	coalesce(sf, wl_prev_prev, wl_prev, wl);
 }
 

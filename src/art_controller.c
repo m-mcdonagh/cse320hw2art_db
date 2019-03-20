@@ -52,10 +52,10 @@ void insertArtCollection(struct art_collection* art_collection){
 	while (sf_cursor->class_size < art_collection->size){
 		sf_cursor = sf_cursor->sf_next_warehouse;
 		if (!sf_cursor){
+			printf("ERROR: There exists no unoccupied warehouse large enough to fit Art Collection \"%s\".\n", art_collection->name);
 			if (art_collection->name)
 				free(art_collection->name);
 			free(art_collection);
-			printf("ERROR: There exists no unoccupied warehouse large enough to fit Art Collection \"%s\".\n", art_collection->name);
 			return;
 		}
 	}
@@ -65,10 +65,10 @@ void insertArtCollection(struct art_collection* art_collection){
 		while (!wl_cursor){
 			sf_cursor = sf_cursor->sf_next_warehouse;
 			if (!sf_cursor){
+				printf("ERROR: There exists no Warehouse large enough to fit Art Collection \"%s\".\n", art_collection->name);
 				if (art_collection->name)
 					free(art_collection->name);
 				free(art_collection);
-				printf("ERROR: There exists no Warehouse large enough to fit Art Collection \"%s\".\n", art_collection->name);
 				return;
 			}
 			wl_cursor = sf_cursor->warehouse_list_head;
@@ -98,8 +98,7 @@ void insertArtCollection(struct art_collection* art_collection){
 						sf_cursor->warehouse_list_head = wl_cursor->next_warehouse;
 					insertWarehouse(createWarehouse(	wl_cursor->warehouse->id, 	artSize),	wl_cursor->meta_info&1);
 					insertWarehouse(createWarehouse(	nextGoodID(),			newSize),	wl_cursor->meta_info&1);
-					freeWarehouse(wl_cursor->warehouse);
-					free(wl_cursor);
+					freeWarehouseList(wl_cursor);
 					insertArtCollection(art_collection);
 					return;
 				}
@@ -108,12 +107,11 @@ void insertArtCollection(struct art_collection* art_collection){
 	}
 }
 extern BOOLEAN equals(char* s1, char* s2);
-void removeArtCollection(char* name){
+void removeArtCollection(char* name, int count){
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	struct warehouse_list* wl_cursor;
 	struct warehouse_list* wl_prev;
 	struct warehouse_list* wl_prev_prev;
-	int count = 0;
 	while (sf_cursor){
 		wl_prev_prev = NULL;
 		wl_prev = NULL;
@@ -121,11 +119,12 @@ void removeArtCollection(char* name){
 		while (wl_cursor){
 			if ((wl_cursor->warehouse->art_collection) && (equals(wl_cursor->warehouse->art_collection->name, name))){
 				emptyWarehouse(sf_cursor, wl_prev_prev, wl_prev, wl_cursor);
-				count++;
+				removeArtCollection(name, ++count);
+				return;
 			}
 			wl_prev_prev = wl_prev;
 			wl_prev = wl_cursor;
-			long int size = (wl_cursor->meta_info & -4) >> 1;
+			//long int size = (wl_cursor->meta_info & -4) >> 1;
 			//printf("\twarehouse %d\n\t\tof size %ld\n\t\t%s with %s in it\n", wl_cursor->warehouse->id, size, (wl_cursor->meta_info & 1)?"Private":"Public", (wl_cursor->meta_info & 2)? wl_cursor->warehouse->art_collection->name : "nothing");
 			wl_cursor = wl_cursor->next_warehouse;
 		}
