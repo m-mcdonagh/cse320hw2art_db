@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <getopt.h>
+#include <ctype.h>
 #include <string.h>
 #include "warehouse.h"
 #define BOOLEAN char
@@ -64,7 +65,7 @@ BOOLEAN executeCommand(char** args){
 			printByPrice(1, 1);
 		}
 		else{
-			printAll(1, 1);
+			printUnsorted(1, 1);
 		}	
 	}
 	else if (equals(*args, "print")){
@@ -77,7 +78,7 @@ BOOLEAN executeCommand(char** args){
 				printByPrice(0, private);
 			}
 			else{
-				printAll(0, private);
+				printUnsorted(0, private);
 			}
 		}
 		else 
@@ -95,8 +96,13 @@ BOOLEAN executeCommand(char** args){
 			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 	}
 	else if (equals(*args, "delete") && *(args + 1) && *(args + 2)){
-		if (equals(*++args, "art"))
-			removeArtCollection(*++args, 0);
+		if (equals(*++args, "art")){
+			args++;
+			int i;
+			for (i=0; i<strlen(*args); i++)
+				(*args)[i] = tolower((*args)[i]);
+			removeArtCollection(*args, 0);
+		}
 		else
 			printf("ERROR: not a valid command, type \"help\" for a list of commands.\n");
 	}
@@ -168,7 +174,15 @@ int main(int argc, char** argv) {
 		fclose(warehouseFile);
 		loadArtFile(artFile);
 		fclose(artFile);
-		printAll(1, 1);
+		if (sizeSort){
+			printBySize(1, 1);
+		}
+		else if (priceSort){
+			printByPrice(1, 1);
+		}
+		else{
+			printUnsorted(1, 1);
+		}	
 	}
 	else
 		shell_loop(5);

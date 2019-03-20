@@ -63,7 +63,7 @@ struct warehouse_sf_list* sf_head;
 		void removeArtCollection(char* name, int count);
 		
 		void printArtCollection(struct art_collection* artC);
-		void printAll(BOOLEAN all, BOOLEAN private);
+		void printUnsorted(BOOLEAN all, BOOLEAN private);
 		void printBySize(BOOLEAN all, BOOLEAN private);
 		void printByPrice(BOOLEAN all, BOOLEAN private);
 

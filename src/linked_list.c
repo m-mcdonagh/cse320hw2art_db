@@ -233,6 +233,18 @@ void insertWarehouse(struct warehouse* warehouse, BOOLEAN private){
 	insertNewWarehouseList( createWarehouseList( warehouse, private ));
 }
 
+/*
+ * loadWarehouseFile()
+ * creates and inserts warehouses from file each specified by ID SIZE TYPE\n
+ *
+ * Params:
+ * 	warehouseFile
+ * 	pointer to the opened file to be read
+ *
+ * Return:
+ * 	void
+ */
+
 void loadWarehouseFile(FILE* warehouseFile){
 	char* commandLine = malloc(256 * sizeof(char*));
 	char** args;
@@ -261,7 +273,7 @@ void loadWarehouseFile(FILE* warehouseFile){
  *
  * Params:
  * 	warehouse
- * 	pointer to the warehouse to be freed
+ * 	pointer to the warehouse to be free()d
  *
  * Return:
  * 	void
@@ -275,6 +287,17 @@ void freeWarehouse(struct warehouse* warehouse){
 	free(warehouse);
 }
 
+/*
+ * freeWarehouseList()
+ * frees the memory allocated to a warehouse list member and calls freeWarehouse() on its encompassed warehouse
+ *
+ * Params:
+ * 	wl
+ * 	pointer to the warehouse list to be free()d
+ *
+ * Return:
+ * 	void
+ */
 void freeWarehouseList(struct warehouse_list* wl){
 	if (wl->warehouse)
 		freeWarehouse(wl->warehouse);
@@ -328,6 +351,27 @@ void freeAllWarehouseSFList(){
 
 /***********************************************************************************************/
 
+/* coalesce()
+ * When emptying a warehouse, this checks if the surrounding warehouses are also empty and of the same type (private/public)
+ * If so, it is coalesced with the ones which match that criteria
+ *
+ * Params:
+ * 	sf
+ * 	the member of the sf list of which the warehouses are apart (so we need not iterate through the list again)
+ *
+ * 	wl_prev_prev
+ * 	the member (if any) of the sf list 2 back from the emptying warehouse (since the database is singly linked)
+ *	provided so if wl_prev is coalesced, it's next_warehouse can update accordingly
+ *
+ * 	wl_prev
+ * 	the member (if any) of the sf list behind the emptying warehouse (since the database is singly linked)
+ *
+ * 	wl
+ * 	the emptying warehouse
+ *
+ * Return:
+ * 	void
+ */
 void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev, struct warehouse_list* wl_prev, struct warehouse_list* wl){
 
 	if ((wl_prev) && !(wl_prev->meta_info & 2) && !((wl->meta_info & 1) ^ (wl_prev->meta_info & 1))){
@@ -371,6 +415,20 @@ void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev,
 	}
 }
 
+/*
+ * emptyWarehouse()
+ * changes the emptying warehouse's allocated bit to 0 and calls coalesce()
+ *
+ * Params:
+ * 	sf, wl_prev_prev, wl_prev
+ * 	for calling coalesce(), since they are found in the calling function
+ *
+ * 	wl
+ * 	the warehouse to be emptied
+ *
+ * Return:
+ * 	void
+ */
 void emptyWarehouse(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev, struct warehouse_list* wl_prev, struct warehouse_list* wl){
 	wl->meta_info = wl->meta_info & -3;
 	coalesce(sf, wl_prev_prev, wl_prev, wl);
@@ -378,6 +436,18 @@ void emptyWarehouse(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev
 
 /***********************************************************************************************/
 
+/*
+ * printUtilization()
+ * prints two ratios
+ * 	the ratio of occupied warehouses to the total number of warehouses 
+ * 	the ratio of the total size of all art collections and the total capacity of all warehouses
+ *
+ * Params:
+ * 	void
+ *
+ * Return:
+ * 	void
+ */
 void printUtilization(){
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	struct warehouse_list* wl_cursor;

@@ -110,7 +110,23 @@ void insertArtCollection(struct art_collection* art_collection){
 		}
 	}
 }
-extern BOOLEAN equals(char* s1, char* s2);
+
+extern BOOLEAN equals(char* s1, char* s2); //used in removeArtCollection defined in main.c
+
+/*
+ * removeArtCollection()
+ * removes all instances of an art collection from the database
+ *
+ * Params:
+ * 	name
+ * 	name to be removed if matching
+ *
+ * 	count
+ * 	variable to keep track of total matching names found, used in recursion, should always be 0 otherwise
+ *
+ * Return: 
+ * 	void
+ */
 void removeArtCollection(char* name, int count){
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	struct warehouse_list* wl_cursor;
@@ -142,11 +158,11 @@ void removeArtCollection(char* name, int count){
 
 /*
  * loadArtFile()
- * inserts into the database art collections from a specified file each of the format: "%s %d %d\n", name, size, price
+ * creates and inserts art collections from file each specified by NAME SIZE PRICE\n
  *
  * Params:
  * 	artFile
- * 	pointer to the file to be read
+ * 	pointer to the opened file to be read
  *
  * Return:
  * 	void
@@ -187,16 +203,22 @@ void printArtCollection(struct art_collection* artC){
 }
 
 /*
- * printAll()
+ * printUnsorted()
  * prints the info of all art collections of the database to stdout
  *
  * Params:
- * 	void
+ * 	all
+ * 	TRUE if all art collections are to be printed,  FALSE otherwise
+ *
+ * 	private
+ * 	TRUE if art collections in private warehouses are to be printed
+ * 	FALSE if art collections in public warehouses are to be printed
+ * 	overridden by all param
  *
  * Return:
  * 	void
  */
-void printAll(BOOLEAN all, BOOLEAN private){
+void printUnsorted(BOOLEAN all, BOOLEAN private){
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	struct warehouse_list* wl_cursor;
 	int total = 0;
@@ -214,11 +236,26 @@ void printAll(BOOLEAN all, BOOLEAN private){
 	printf("%d\n", total);
 }
 
+/*
+ * art_collection_list
+ * Data Structure to help sort art collections for printing
+ */
 struct art_collection_list{
 	struct art_collection* art_collection;
 	struct art_collection_list* next;
 };
 
+/*
+ * printAndFreeACL()
+ * once the art collection list is made and sorted, this function prints all of them and frees the art collection list wrapper (not the art collection itself)
+ *
+ * Params:
+ * 	acl_cursor
+ * 	head of the art collection list
+ *
+ * Return:
+ * 	void
+ */
 void printAndFreeACL(struct art_collection_list* acl_cursor){
 	struct art_collection_list* acl_prev;
 	int total = 0;
@@ -231,6 +268,22 @@ void printAndFreeACL(struct art_collection_list* acl_cursor){
 	printf("%d\n", total);
 }
 
+/*
+ * printBySize()
+ * creates the acl data structure sorted by size and calls printAndFreeACL()
+ *
+ * Params:
+ * 	all
+ * 	TRUE if all art collections are to be printed,  FALSE otherwise
+ *
+ * 	private
+ * 	TRUE if art collections in private warehouses are to be printed
+ * 	FALSE if art collections in public warehouses are to be printed
+ * 	overridden by all param
+ *
+ * Return:
+ * 	void
+ */
 void printBySize(BOOLEAN all, BOOLEAN private){
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	struct warehouse_list* wl_cursor;
@@ -284,6 +337,22 @@ void printBySize(BOOLEAN all, BOOLEAN private){
 	printAndFreeACL(acl_head);
 }
 
+/*
+ * printByPrice()
+ * creates the acl data structure sorted by price and calls printAndFreeACL()
+ *
+ * Params:
+ * 	all
+ * 	TRUE if all art collections are to be printed,  FALSE otherwise
+ *
+ * 	private
+ * 	TRUE if art collections in private warehouses are to be printed
+ * 	FALSE if art collections in public warehouses are to be printed
+ * 	overridden by all param
+ *
+ * Return:
+ * 	void
+ */
 void printByPrice(BOOLEAN all, BOOLEAN private){	
 	struct warehouse_sf_list* sf_cursor = sf_head;
 	struct warehouse_list* wl_cursor;
