@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include "warehouse.h"
 
@@ -24,6 +25,9 @@ struct art_collection* createArtCollection(char* name, int size, int price){
 	struct art_collection* output = malloc(sizeof(struct art_collection));
 	output->name = malloc(strlen(name)+1);
 	strcpy(output->name, name);
+	int i;
+	for (i=0; i<strlen(output->name); i++)
+		(output->name)[i] = tolower((output->name)[i]);
 	output->size = size;
 	output->price = price;
 	return output;
