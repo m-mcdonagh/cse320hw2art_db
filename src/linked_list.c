@@ -368,15 +368,6 @@ void coalesce(struct warehouse_sf_list* sf, struct warehouse_list* wl_prev_prev,
 			freeWarehouseList(wl->next_warehouse);
 			freeWarehouseList(wl);
 		}
-		else {
-			if (wl_prev){
-				wl_prev->next_warehouse = wl->next_warehouse;
-			}
-			else{
-				sf->warehouse_list_head = wl->next_warehouse;
-			}
-			freeWarehouseList(wl);
-		}
 	}
 }
 

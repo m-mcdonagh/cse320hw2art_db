@@ -117,7 +117,7 @@ void removeArtCollection(char* name, int count){
 		wl_prev = NULL;
 		wl_cursor = sf_cursor->warehouse_list_head;
 		while (wl_cursor){
-			if ((wl_cursor->warehouse->art_collection) && (equals(wl_cursor->warehouse->art_collection->name, name))){
+			if ((wl_cursor->meta_info & 2) && (equals(wl_cursor->warehouse->art_collection->name, name))){
 				emptyWarehouse(sf_cursor, wl_prev_prev, wl_prev, wl_cursor);
 				removeArtCollection(name, ++count);
 				return;
